@@ -1,5 +1,6 @@
 package com.eventplanner.userservice.controller;
 
+import org.springframework.security.core.Authentication;
 import com.eventplanner.userservice.dto.LoginRequest;
 import com.eventplanner.userservice.dto.RegisterRequest;
 import com.eventplanner.userservice.dto.UserResponse;
@@ -27,8 +28,27 @@ public class UserController {
         return ResponseEntity.ok(userService.login(request));
     }
 
+
     @GetMapping("/me")
-    public ResponseEntity<String> me() {
-        return ResponseEntity.ok("Token doğrulandı! Hoş geldin.");
+    public UserResponse me(Authentication authentication) {
+        String email = authentication.getName();
+        return userService.getCurrentUser(email);
     }
+
+    @PutMapping("/me")
+    public UserResponse updateMe(
+            Authentication authentication,
+            @RequestBody RegisterRequest request
+    ) {
+        String email = authentication.getName();
+        return userService.updateCurrentUser(email, request);
+    }
+
+    @DeleteMapping("/me")
+    public void deleteMe(Authentication authentication) {
+        String email = authentication.getName();
+        userService.deleteCurrentUser(email);
+    }
+
+
 }
